@@ -41,20 +41,7 @@ public class MainActivity extends AppCompatActivity {
         bt_close = (Button) findViewById(R.id.bt_close);
 
 
-        tConnect =   new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    socket  = new Socket(serverIp, serverPort);
-                    out = new DataOutputStream(socket.getOutputStream());
-                    Log.d("lab", "서버연결 완료.");
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.d("lab", "서버연결 에러 .");
-                }
-            }
-        });
 
         bt_send.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -71,7 +58,10 @@ public class MainActivity extends AppCompatActivity {
         bt_connect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tConnect.start();  // 서버 연결 시작
+
+                    connect();
+                    tConnect.start();  // 쓰레드 시작 및 서버 연결 시작
+
             }
         });
 
@@ -80,8 +70,26 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 try {
                     socket.close();   // 서버 연결 종료
+                    tConnect.interrupt(); // 쓰레드 종료
                 } catch (IOException e) {
                     e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    void connect() {
+        tConnect =   new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    socket  = new Socket(serverIp, serverPort);
+                    out = new DataOutputStream(socket.getOutputStream());
+                    Log.d("lab", "서버연결 완료.");
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.d("lab", "서버연결 에러 .");
                 }
             }
         });
